@@ -17,7 +17,7 @@
 
 using namespace swarmtal_msgs;
 #define MAX_CMD_LOST_TIME 0.5f
-// #define USE_DJI_THRUST_CTRL
+#define USE_DJI_THRUST_CTRL
 #define ANGULARRATE_MIX 0.9
 #define MAX_ACC 8 // max accerelation
 

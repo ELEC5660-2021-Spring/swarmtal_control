@@ -214,7 +214,7 @@ public:
         nh.param<bool>("rc_fail_detection", rc_fail_detection, true);
         nh.param<double>("landing_thrust_min", landing_thrust_min, 0.0);
         nh.param<double>("landing_thrust_max", landing_thrust_max, 0.0);
-        nh.param<double>("max_vo_latency", MAX_VO_LATENCY, 0.4);
+        nh.param<double>("max_vo_latency", MAX_VO_LATENCY, 1.0);
 
 
         if (rc_fail_detection) {
@@ -543,17 +543,17 @@ void DroneCommander::battery_callback(const sensor_msgs::BatteryState &_bat) {
 
     //ROS_INFO("Battery Level: %3.2f, Left Time: %3.2f", state.bat_vol, state.bat_remain);
 
-    if (state.bat_remain <= BATTERY_REMAIN_CUTOFF &&
-        state.flight_status == DCMD::FLIGHT_STATUS_IN_AIR) {
-        //ROS_INFO("Battery Low, Landing");
-        state.landing_mode = DCMD::LANDING_MODE_XYVEL;
-        state.landing_velocity = LANDING_VEL_Z_BATTERY_LOW;
-        request_ctrl_mode(DCMD::CTRL_MODE_LANDING);
-        process_control_landing();
-    }
-    else  {
-        //ROS_INFO("Battery Low");
-    }
+ //   if (state.bat_remain <= BATTERY_REMAIN_CUTOFF &&
+   //     state.flight_status == DCMD::FLIGHT_STATUS_IN_AIR) {
+     //   //ROS_INFO("Battery Low, Landing");
+     //   state.landing_mode = DCMD::LANDING_MODE_XYVEL;
+     //   state.landing_velocity = LANDING_VEL_Z_BATTERY_LOW;
+     //   request_ctrl_mode(DCMD::CTRL_MODE_LANDING);
+     //   process_control_landing();
+  //  }
+   // else  {
+    //    //ROS_INFO("Battery Low");
+   // }
 }
 
 void DroneCommander::rc_callback(const sensor_msgs::Joy & _rc) {

@@ -1,5 +1,5 @@
 <launch>
-    <arg name="vo_topic" default="/aug_ekf/ekf_fused_odom"/>
+    <arg name="vo_topic" default="/vins_estimator/imu_propagate"/>
     <arg name="output" default="screen" />
     <node pkg="drone_position_control" name="drone_position_control" type="drone_position_control_node" output="$(arg output)" launch-prefix="nice --20" >
         <rosparam command="load" file="/home/dji/config/pos_control_param.yaml" />
