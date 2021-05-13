@@ -16,10 +16,9 @@ def send(cmd, args, pub):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='A easy command tool for sending command to swarm drone')
     parser.add_argument('command_type', metavar='command_type', choices=
-        ["takeoff", "landing", "emland", "flyto","vel", "arm", "disarm", "joy_control", "circle", "circle_yaw", "circle_plus", "circle_plus_yaw", "sweep", "csv"], help="Type of command to send")
+        ["takeoff", "landing", "emland", "flyto","vel", "arm", "disarm", "joy_control", "circle", "circle_yaw", "sweep", "csv"], help="Type of command to send")
     parser.add_argument("-c","--center", nargs=3, type=float, help="center for circle", default=[0, 0, 1])
     parser.add_argument("-r","--radius", type=float, help="radius for circle", default=0.5)
-    parser.add_argument("-ht","--height", type=float, help="height for circle_plus", default=0.3)
     parser.add_argument("-t","--cycle", type=float, help="cycle for circle or for sweep a cycle", default=30)
     parser.add_argument("--fmin", type=float, help="min freq for sweep", default=0.1)
     parser.add_argument("--fmax", type=float, help="max freq for sweep", default=5)
@@ -203,78 +202,6 @@ if __name__ == "__main__":
             except KeyboardInterrupt:
                 exit(0)
 
-    elif args.command_type == "circle_plus" or args.command_type == "circle_plus_yaw":
-        cmd.command_type = drone_onboard_command.CTRL_POS_COMMAND
-        print("Will draw circle @ origin {} {} {}, r {} T {} h {}".format(
-            args.center[0],
-            args.center[1],
-            args.center[2],
-            args.radius,
-            args.cycle,
-	    args.height
-        ))
-
-        ox = args.center[0]
-        oy = args.center[1]
-        oz = args.center[2]
-        r = args.radius
-        T = args.cycle
-	h = args.height
-
-
-        cmd.param1 = 0
-        cmd.param2 = 0
-        cmd.param3 = 0
-        cmd.param4 = 666666
-        cmd.param5 = 0
-        cmd.param6 = 0
-        cmd.param7 = 0
-        cmd.param8 = 0
-        cmd.param9 = 0
-        cmd.param10 = 0
-
-        t = 0
-        yaw = 666666
-        while not rospy.is_shutdown():
-            try:
-                x = ox + math.sin(t*math.pi*2/T)*r
-                y = oy + math.cos(t*math.pi*2/T)*r
-		z = oz + math.sin(t*math.pi*2/T)*h
-                vx = math.cos(t*math.pi*2/T) * r * math.pi*2/T
-                vy = -math.sin(t*math.pi*2/T) * r * math.pi*2/T
-		vz = math.cos(t*math.pi*2/T) * h * math.pi*2/T
-                if args.command_type == "circle_plus_yaw":
-                    yaw = t*math.pi*2/T
-                ax = - math.sin(t*math.pi*2/T) * r * math.pi*2/T * math.pi*2/T
-                ay = - math.cos(t*math.pi*2/T) * r * math.pi*2/T * math.pi*2/T
-		az = - math.sin(t*math.pi*2/T) * h * math.pi*2/T * math.pi*2/T
-
-                cmd.param1 = int(x*10000)
-                cmd.param2 = int(y*10000)
-                #cmd.param3 = int(oz*10000)
-		cmd.param3 = int(z*10000)
-                if args.command_type == "circle_plus_yaw":
-                    cmd.param4 = int(yaw*10000)
-                cmd.param5 = int(vx*10000)
-                cmd.param6 = int(vy*10000)
-                #cmd.param7 = 0
-		cmd.param7 = int(vz*10000)
-
-                cmd.param8 = int(ax*10000)
-                cmd.param9 = int(ay*10000)
-		cmd.param10 = int(az*10000)
-		print("x {} y {} z {}".format(cmd.param1,cmd.param2,cmd.param3))
-
-
-                #rospy.loginfo("{:3.2f} xyz {:3.2f} {:3.2f} {:3.2f} Y {:3.2f} ff {:3.2f} {:3.2f} {:3.2f} {:3.2f}".format(t, x, y, oz, yaw, vx, vy, ax, ay))
-		rospy.loginfo("{:3.2f} xyz {:3.2f} {:3.2f} {:3.2f} Y {:3.2f} ff {:3.2f} {:3.2f} {:3.2f} {:3.2f} {:3.2f} {:3.2f}".format(t, x, y, z, yaw, vx, vy, vz, ax, ay, az))
-                send(cmd, args, pub)
-                t = t + 0.02
-                rate.sleep()
-
-            except KeyboardInterrupt:
-                exit(0)
-
     elif args.command_type == "csv":
         cmd.command_type = drone_onboard_command.CTRL_POS_COMMAND
         cmd.param4 = 666666
@@ -305,10 +232,6 @@ if __name__ == "__main__":
             z = csv_data[tick,2]
             vx = csv_data[tick,3]
             vy = csv_data[tick,4]
-            vz = 0
-            ax = csv_data[tick,6]
-            ay = csv_data[tick,7]
-            az = 0
 
             cmd.param1 = int(x*10000)
             cmd.param2 = int(y*10000)
@@ -316,9 +239,6 @@ if __name__ == "__main__":
             cmd.param5 = int(vx*10000)
             cmd.param6 = int(vy*10000)
             cmd.param7 = 0
-            cmd.param8 = int(ax*10000)
-            cmd.param9 = int(ay*10000)
-            cmd.param10 = 0
 
 
             rospy.loginfo_throttle(0.1, "{:3.2f} xyz {:3.2f} {:3.2f} {:3.2f} ff {:3.2f} {:3.2f}".format(t, x, y, z, vx, vy))
